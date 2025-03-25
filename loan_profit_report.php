@@ -110,7 +110,7 @@ $result = getLoanProfitData($conn);
 </head>
 <body>
     <h1>Отчёт о прибыли по типам кредитов</h1>
-
+    <a href="dashboard.php" class="button">Назад в личный кабинет</a><br>
     <div style="margin-bottom: 20px;">
         <a href="?action=export_word" style="text-decoration: none;">
             <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;">

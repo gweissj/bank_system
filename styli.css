@@ -1,9 +1,8 @@
-/* Общие стили */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4; /* Спокойный фоновый цвет */
+    background-color: #f4f4f4;
     color: #333;
 }
 
@@ -68,7 +67,6 @@ h1, h2, h3 {
     background-color: #218838;
 }
 
-/* Стили для блоков кредитов и транзакций */
 .items-container {
     display: flex;
     flex-wrap: wrap;
@@ -115,7 +113,6 @@ h1, h2, h3 {
     background-color: #f9f9f9;
 }
 
-/* Стили для форм */
 .transfer-form, .open-account-form, .loan-application-form {
     margin-top: 20px;
     border: 1px solid #ddd;

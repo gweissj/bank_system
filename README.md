@@ -521,37 +521,49 @@ class Database {
 Можно открыть новый счет, где из выпадающего списка необходимо выбрать его тип, также валюту, и начальный баланс.
 За определенный интервал времени можно посмотреть историю транзакций.
 
+![image](https://github.com/user-attachments/assets/1d5c383b-3c4d-42bc-bd75-eb35fe02a9a1)
+Рис. 5 - Отчет по истории транзакций у клиента. Можно скачать в Word или в Excel
+
+
+![image](https://github.com/user-attachments/assets/54ad950b-90f1-495e-8b81-df10e6c97194)
+Рис. 6 - Скачанный отчет по истории транзакций у клиента
+
 
 ![image](https://github.com/user-attachments/assets/7c5a7951-35b5-41b1-b812-d3e0256c3395)
-Рис. 5 – История транзакций в личном кабинете
+Рис. 7 – История транзакций в личном кабинете
 
 ![image](https://github.com/user-attachments/assets/25cd50c9-82f8-4133-9aa3-c1c88f6400c7)
-Рис. 6 – Пункт меню подать заявку на кредит
+Рис. 8 – Пункт меню подать заявку на кредит
 Необходимо выбрать тип кредита и его сумму. После отправки заявки со стороны работников банка выносится решение одобрен кредит или нет.
 
 
 Вход со стороны сотрудника
 ![image](https://github.com/user-attachments/assets/569267eb-1efd-4a5c-8fc6-a3fc7588e056)
-Рис. 7 – Вход для сотрудников
+Рис. 9 – Вход для сотрудников
 С сотрудниками в случае входа та же ситуация что и для клиентов.
 
 ![image](https://github.com/user-attachments/assets/5a5b8603-e4fd-4901-9ce0-6afcfa556544)
-Рис. 8 – Панель управления сотрудников
+Рис. 10 – Панель управления сотрудников
 
 ![image](https://github.com/user-attachments/assets/248f86f6-8fbf-4e60-81a5-83203c431064)
-Рис. 9 – Заявки на кредит 
+Рис. 11 – Заявки на кредит 
 В этом пункте сотрудник может видеть поступившую заявку на кредит, где он выносит решение, в случае одобрения кредита указывает процентную ставку, когда кредит должен быть выплачен.
 
 ![image](https://github.com/user-attachments/assets/882c708c-3b01-4042-a035-132d15065e4b)
-Рис. 10 – Подозрительные транзакции
+Рис. 12 – Подозрительные транзакции
 В данном пункте можно увидеть одну подозрительную транзакцию, она появилась в результате того что обычно клиент банка выполнял переводы суммами не превышающими кратно предыдущие, и в конце концов выполнил перевод на 40000 рублей что оказалось сильно выше прошлых переводов.
 
 Также можно применить фильтры и выполнить выгрузку данных в удобном формате.
-![image](https://github.com/user-attachments/assets/660f778f-0ce6-4905-81f1-f861f9d01fac)
-Рис. 11 – Отчёт по прибыли по типам кредитов
+![image](https://github.com/user-attachments/assets/b9f1ba19-86fa-4083-8a26-3061ec87eebb)
+
+Рис. 13 – Отчёт по прибыли по типам кредито у сотрудников. Можно скачать в Word или в Excel
+
+![image](https://github.com/user-attachments/assets/d48925d0-25d4-42b7-81ca-68881dc4c204)
+Рис. 14 - Скачанный отчет в Word по прибыли по типам кредитов.
+
 
 ![image](https://github.com/user-attachments/assets/c62a9406-66c9-43c2-bd42-b7b954843d7d)
-Рис. 12 – Поле регистрации для новых клиентов
+Рис. 15 – Поле регистрации для новых клиентов
 Функционал включает:
 •	Вход клиентов и сотрудников.
 •	Управление счетами (просмотр, создание, переводы).
@@ -559,6 +571,102 @@ class Database {
 •	Анализ транзакций на предмет подозрительных операций.
 •	Генерацию отчётов.
 Приложение предоставляет интерфейс для клиентов и сотрудников, обеспечивая удобный доступ к банковским операциям.
+
+
+![image](https://github.com/user-attachments/assets/2bd8ed27-0cfe-46fe-a44c-15fbe19e6ad5)
+Рис. 16 - Пароли в зашифрованном виде в базе данных у клиентов 
+
+
+![image](https://github.com/user-attachments/assets/f5bc36f1-33b3-4133-b199-7b4af5d8a448)
+Рис. 17 - Пароли в зашифрованном виде в базе данных у сотрудников
+
+
+
+
+-----------------------------------------------------------------------------------
+Безопасность: 
+
+1) Проверка пароля у пользователя при входе в систему:
+<?php
+session_start();
+require_once 'classes/Database.php';
+require_once 'classes/Client.php';
+
+$database = new Database();
+$conn = $database->getConnection();
+
+$client = new Client($conn);
+
+$query = "SELECT First_name, Last_name, Email, Password, Plain_password FROM Clients";
+$stmt = $conn->prepare($query);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$clients = $result->fetch_all(MYSQLI_ASSOC);
+
+$message = '';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $user_id = $client->login($email, $password);
+    if ($user_id) {
+        $_SESSION['user_id'] = $user_id;
+        header("Location: dashboard.php");
+        exit;
+    } else {
+        $message = "Неверный email или пароль.";
+    }
+}
+?>
+
+
+2) ![image](https://github.com/user-attachments/assets/3d46d80a-159c-41ee-8361-c4f2ea617e96)
+Рис. 18 - проверка при регистрации клиента
+
+
+3) Проверка при входе у сотрудников:
+<?php
+session_start();
+require_once 'classes/Database.php';
+require_once 'classes/Staff.php';
+
+$database = new Database();
+$conn = $database->getConnection();
+$staff = new Staff($conn);
+
+$query = "SELECT ID_staff, First_name, Last_name, Email, Password, Plain_password FROM Staff";
+$stmt = $conn->prepare($query);
+$stmt->execute();
+$result = $stmt->get_result();
+$staff_members = $result->fetch_all(MYSQLI_ASSOC);
+
+$message = '';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $user_id = $staff->login($email, $password);
+    if ($user_id) {
+        $_SESSION['staff_id'] = $user_id;
+        header("Location: staff_dashboard.php");
+        exit;
+    } else {
+        $message = "Неверный email или пароль.";
+    }
+}
+?>
+
+
+4) В сотрудниках используется следующая реализация разделения "ролей": если у сотрудника роль "сотрудник кредитного отдела", то он видит следующую информацию - может одобрять заявки на открытие/закрытие кредитов; может смотреть отчеты:
+![image](https://github.com/user-attachments/assets/31615d6c-8f55-4f54-b42f-e378e0c95092)
+
+Если у сотрудника роль "администратор", то он видит следующую информацию - у него уже отображается новая кнопка "отчет по сотрудникам"; перейти по кнопке "заявки по кредитам" сотрудник с данной ролью НЕ может - открывать и закрывать кредиты не может:
+![image](https://github.com/user-attachments/assets/63e4bd72-b497-4c29-9a89-3d7cc0b7ff4d)
+
+Если у сотрудника роль "менеджер" или "кассир", то он видит следующую информацию - "отчет по подозрительным транзакциям"; "отчет по прибыли по типам кредитов"; одобрить заявку на кредит или закрыть кредит сотрудник с данной ролью НЕ может:
+![image](https://github.com/user-attachments/assets/e26ae10c-45eb-46f5-a26d-41318d900514)
+
 
 
 
